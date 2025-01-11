@@ -11,10 +11,10 @@ import voluptuous as vol
 import homeassistant.helpers.config_validation as cv
 from homeassistant.components.light import (
     ATTR_BRIGHTNESS,
-    ATTR_COLOR_TEMP,
     ATTR_RGB_COLOR,
     ATTR_TRANSITION,
     ATTR_XY_COLOR,
+    ATTR_COLOR_TEMP_KELVIN,
 )
 from homeassistant.components.light import DOMAIN as LIGHT_DOMAIN
 from homeassistant.components.light import VALID_TRANSITION, is_on
@@ -32,7 +32,6 @@ from homeassistant.helpers.restore_state import RestoreEntity
 from homeassistant.util import slugify
 from homeassistant.util.color import (
     color_RGB_to_xy,
-    color_temperature_kelvin_to_mired,
     color_temperature_to_rgb,
     color_xy_to_hs,
 )
@@ -291,9 +290,6 @@ class CircadianSwitch(SwitchEntity, RestoreEntity):
             else self._sleep_colortemp
         )
 
-    def _calc_ct(self):
-        return color_temperature_kelvin_to_mired(self._color_temperature())
-
     def _calc_rgb(self):
         return color_temperature_to_rgb(self._color_temperature())
 
@@ -357,7 +353,7 @@ class CircadianSwitch(SwitchEntity, RestoreEntity):
 
             light_type = self._lights_types[light]
             if light_type == "ct":
-                service_data[ATTR_COLOR_TEMP] = int(self._calc_ct())
+                service_data[ATTR_COLOR_TEMP_KELVIN] = int(self._color_temperature())
             elif light_type == "rgb":
                 r, g, b = self._calc_rgb()
                 service_data[ATTR_RGB_COLOR] = (int(r), int(g), int(b))
